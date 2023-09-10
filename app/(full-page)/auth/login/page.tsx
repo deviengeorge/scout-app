@@ -1,10 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 import { useRouter } from 'next/navigation';
-import React, { useContext, useState } from 'react';
-import { Checkbox } from 'primereact/checkbox';
+import React, { useContext } from 'react';
 import { Button } from 'primereact/button';
-import { Password } from 'primereact/password';
 import { LayoutContext } from '../../../../layout/context/layoutcontext';
 import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';
@@ -26,7 +24,7 @@ const LoginPage = () => {
 
     const onSubmit = (values: Inputs) => {
         axios.post('/api/login', values).then((res) => {
-            router.push('/');
+            router.push('/pages/tickets');
             localStorage.setItem('user', JSON.stringify(res.data));
         });
     };
