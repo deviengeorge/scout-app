@@ -14,7 +14,7 @@ const AppMenu = () => {
             icon: 'pi pi-fa pi-briefcase',
             to: '/pages',
             items: [
-                { label: 'Dashboard', icon: 'pi pi-fa pi-home', to: '/' },
+                // { label: 'Dashboard', icon: 'pi pi-fa pi-home', to: '/' },
                 {
                     label: 'Tickets',
                     icon: 'pi pi-fa pi-ticket',
