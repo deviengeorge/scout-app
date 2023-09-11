@@ -9,6 +9,11 @@ export const metadata: Metadata = {
     description: 'Nour ElAlam Scouts Website.',
     robots: { index: false, follow: false },
     viewport: { initialScale: 1, width: 'device-width' },
+    twitter: {
+        title: 'Nour ElAlam Website',
+        description: 'Nour ElAlam Scouts Website.',
+        images: ['https://nour-elalam-scout.vercel.app/scout-logo.png']
+    },
     openGraph: {
         type: 'website',
         title: 'Nour ElAlam Website',

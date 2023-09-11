@@ -82,7 +82,7 @@ const TicketPage = () => {
     const fetchTickets = () => {
         const user = localStorage.getItem('user') || '';
         const userJson = JSON.parse(user);
-        axios.post('/api/tickets', { user_id: userJson.role === 'agent' ? userJson.id : null }).then((res) => {
+        axios.post('/api/tickets', { user_id: userJson.role === 'agent' ? userJson.id : 0 }).then((res) => {
             setTickets(res.data);
         });
     };
