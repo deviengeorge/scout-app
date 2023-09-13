@@ -197,7 +197,7 @@ const TicketPage = () => {
                     <h2>Departments</h2>
                     {info?.departments?.map((person: any) => (
                         <div style={{ display: 'inline' }} key={person.department}>
-                            <span>{person.department}: </span>
+                            <span>{person.agent}: </span>
                             <span style={{ fontWeight: 'bold' }}>{person.count} Tickets</span>
                             <br />
                         </div>
