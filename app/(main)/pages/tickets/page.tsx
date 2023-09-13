@@ -187,7 +187,7 @@ const TicketPage = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
                     <h2>Agents</h2>
                     {info?.agents?.map((person: any) => (
-                        <div style={{ display: 'inline' }}>
+                        <div style={{ display: 'inline' }} key={person.agent}>
                             <span>{person.agent}: </span>
                             <span style={{ fontWeight: 'bold' }}>{person.count} Tickets</span>
                             <br />
@@ -196,8 +196,8 @@ const TicketPage = () => {
 
                     <h2>Departments</h2>
                     {info?.departments?.map((person: any) => (
-                        <div style={{ display: 'inline' }}>
-                            <span>{person.agent}: </span>
+                        <div style={{ display: 'inline' }} key={person.department}>
+                            <span>{person.department}: </span>
                             <span style={{ fontWeight: 'bold' }}>{person.count} Tickets</span>
                             <br />
                         </div>
