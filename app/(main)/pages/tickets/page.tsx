@@ -34,24 +34,31 @@ const TicketPage = () => {
 
     const router = useRouter();
 
-    const { control, reset: resetForm, handleSubmit, watch, setValue } = useForm<Ticket>({ defaultValues: emptyTicket });
+    const { control, reset: resetForm, handleSubmit, watch, setValue, setError, getValues } = useForm<Ticket>({ defaultValues: emptyTicket });
 
     const onAddTicket = (values: Ticket) => {
         const user = localStorage.getItem('user');
         if (!user) return router.push('/auth/login');
 
         const userData = JSON.parse(user || '');
-        axios.post('/api/add-ticket', { ...values, with_bus: Boolean(values.with_bus), agent: userData.id }).then((res) => {
-            fetchTickets();
-            toast.current?.show({
-                severity: 'success',
-                summary: 'Successful',
-                detail: 'TIcket Created',
-                life: 3000
+        axios
+            .post('/api/add-ticket', { ...values, with_bus: values.with_bus === 'false' ? false : true, agent: userData.id })
+            .then((res) => {
+                fetchTickets();
+                toast.current?.show({
+                    severity: 'success',
+                    summary: 'Successful',
+                    detail: 'TIcket Created',
+                    life: 3000
+                });
+                setTicketDialog(false);
+                resetForm();
+            })
+            .catch((err: any) => {
+                console.log(err.response.data.ticket_id);
+                alert(err.response.data.ticket_id);
+                setError('ticket_id', err.response.data.ticket_id);
             });
-            setTicketDialog(false);
-            resetForm();
-        });
     };
 
     const onEditTicket = (values: Ticket) => {
@@ -59,7 +66,7 @@ const TicketPage = () => {
         if (!user) return router.push('/auth/login');
 
         const userData = JSON.parse(user || '');
-        axios.post('/api/edit-ticket', { ...values, with_bus: Boolean(values.with_bus), agent: userData.id }).then((res) => {
+        axios.post('/api/edit-ticket', { ...values, with_bus: values.with_bus === 'false' ? false : true, agent: userData.id }).then((res) => {
             fetchTickets();
             toast.current?.show({
                 severity: 'success',
@@ -75,6 +82,7 @@ const TicketPage = () => {
     const [ticketDialog, setTicketDialog] = useState(false);
     const [ticketEditDialog, setTicketEditDialog] = useState(false);
     const [tickets, setTickets] = useState([]);
+    const [info, setInfo] = useState<any>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<any>>(null);
@@ -84,6 +92,9 @@ const TicketPage = () => {
         const userJson = JSON.parse(user);
         axios.post('/api/tickets', { user_id: userJson.role === 'agent' ? userJson.id : 0 }).then((res) => {
             setTickets(res.data);
+        });
+        axios.post(`/api/info`, { user_id: userJson.role === 'agent' ? userJson.id : 0 }).then((res) => {
+            setInfo(res.data);
         });
     };
 
@@ -110,7 +121,7 @@ const TicketPage = () => {
         setValue('gender', ticket.gender);
         setValue('name', ticket.name);
         setValue('phone', ticket.phone);
-        setValue('ticket_id', ticket.ticket_id);
+        setValue('ticket_id', ticket.ticket_id, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
         setValue('with_bus', String(ticket.with_bus));
         setTicketEditDialog(true);
     };
@@ -130,9 +141,7 @@ const TicketPage = () => {
     const leftToolbarTemplate = () => {
         return (
             <React.Fragment>
-                <div className="my-2">
-                    <Button label="New" icon="pi pi-plus" severity="success" className=" mr-2" onClick={openNew} />
-                </div>
+                <Button label="New" icon="pi pi-plus" severity="success" className=" mr-2" onClick={openNew} />
             </React.Fragment>
         );
     };
@@ -176,27 +185,34 @@ const TicketPage = () => {
                 <div className="card">
                     <Toast ref={toast} />
                     <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
+                    <h2>Agents</h2>
+                    {info?.agents?.map((person: any) => (
+                        <div style={{ display: 'inline' }}>
+                            <span>{person.agent}: </span>
+                            <span style={{ fontWeight: 'bold' }}>{person.count} Tickets</span>
+                            <br />
+                        </div>
+                    ))}
 
-                    <DataTable
-                        ref={dt}
-                        value={tickets}
-                        dataKey="id"
-                        paginator
-                        rows={10}
-                        rowsPerPageOptions={[5, 10, 25]}
-                        className="datatable-responsive"
-                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
-                        globalFilter={globalFilter}
-                        emptyMessage="No Tickets found."
-                        header={header}
-                    >
+                    <h2>Departments</h2>
+                    {info?.departments?.map((person: any) => (
+                        <div style={{ display: 'inline' }}>
+                            <span>{person.agent}: </span>
+                            <span style={{ fontWeight: 'bold' }}>{person.count} Tickets</span>
+                            <br />
+                        </div>
+                    ))}
+
+                    <br />
+                    <br />
+
+                    <DataTable ref={dt} value={tickets} dataKey="id" className="datatable-responsive" globalFilter={globalFilter} emptyMessage="No Tickets found." header={header}>
                         <Column field="ticket_id" header="Ticket ID" sortable headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="name" header="Name" sortable headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="department" header="Department" headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="department" header="Department" sortable headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="with_bus" header="With Bus?" headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="is_sms_sent" header="SMS sent?" headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="agent.name" header="Agent" headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="agent.name" header="Agent" sortable headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="gender" header="Gender" headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
@@ -346,7 +362,6 @@ const TicketPage = () => {
                             <div className="field">
                                 <Controller
                                     name="ticket_id"
-                                    disabled
                                     control={control}
                                     rules={{ required: 'Ticket ID is required.' }}
                                     render={({ field, fieldState }) => (
