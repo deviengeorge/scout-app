@@ -22,6 +22,16 @@ interface Ticket {
     name: string;
 }
 
+const departments = {
+    primary: 'ابتدائي',
+    middle: 'اعدادي',
+    high: 'ثانوي',
+    rover_candidates: 'جوالة',
+    scout: 'قادة',
+    normal: 'عامة',
+    vip: 'VIP'
+};
+
 const TicketPage = () => {
     let emptyTicket: Ticket = {
         name: '',
@@ -31,6 +41,9 @@ const TicketPage = () => {
         department: 'normal',
         with_bus: 'false'
     };
+
+    const user = localStorage.getItem('user');
+    const userJson = JSON.parse(user || '');
 
     const router = useRouter();
 
@@ -185,7 +198,7 @@ const TicketPage = () => {
                 <div className="card">
                     <Toast ref={toast} />
                     <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
-                    <h2>Agents</h2>
+                    {userJson.role !== 'agent' && <h2>Agents</h2>}
                     {info?.agents?.map((person: any) => (
                         <div style={{ display: 'inline' }}>
                             <span>{person.agent}: </span>
@@ -194,7 +207,7 @@ const TicketPage = () => {
                         </div>
                     ))}
 
-                    <h2>Departments</h2>
+                    {userJson.role !== 'agent' && <h2>Departments</h2>}
                     {info?.departments?.map((person: any) => (
                         <div style={{ display: 'inline' }}>
                             <span>{person.agent}: </span>
@@ -202,6 +215,19 @@ const TicketPage = () => {
                             <br />
                         </div>
                     ))}
+
+                    {userJson.role === 'agent' && <p>Tickets Count: {tickets.length} ticket</p>}
+
+                    {userJson.role !== 'agent' && (
+                        <>
+                            <p>
+                                Full Tickets Count: <span style={{ fontWeight: 'bold' }}>{info?.full?.ticket_count}</span> ticket
+                            </p>
+                            <p>
+                                With Bus Tickets Count: <span style={{ fontWeight: 'bold' }}>{info?.bus?.bus_count}</span> ticket
+                            </p>
+                        </>
+                    )}
 
                     <br />
                     <br />
@@ -214,7 +240,7 @@ const TicketPage = () => {
                         <Column field="is_sms_sent" header="SMS sent?" headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="agent.name" header="Agent" sortable headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="gender" header="Gender" headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        {userJson.role !== 'viewer' && <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>}
                     </DataTable>
 
                     <Dialog visible={ticketDialog} style={{ width: '450px' }} header="Ticket Details" modal className="p-fluid" footer={ticketDialogFooter} onHide={hideDialog}>

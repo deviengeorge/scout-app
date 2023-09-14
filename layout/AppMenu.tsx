@@ -8,6 +8,9 @@ import Link from 'next/link';
 import { AppMenuItem } from '../types/types';
 
 const AppMenu = () => {
+    const user = localStorage.getItem('user');
+    const userJson = JSON.parse(user || '');
+
     const model: AppMenuItem[] = [
         {
             label: 'Pages',
@@ -23,6 +26,14 @@ const AppMenu = () => {
             ]
         }
     ];
+
+    if (userJson.role !== 'agent') {
+        model[0].items?.push({
+            label: 'Attendance',
+            icon: 'pi pi-fa pi-user',
+            to: '/pages/attendance'
+        });
+    }
 
     return (
         <MenuProvider>
