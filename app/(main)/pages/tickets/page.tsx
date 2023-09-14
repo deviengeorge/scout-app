@@ -200,7 +200,7 @@ const TicketPage = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
                     {userJson.role !== 'agent' && <h2>Agents</h2>}
                     {info?.agents?.map((person: any) => (
-                        <div style={{ display: 'inline' }}>
+                        <div style={{ display: 'inline' }} key={person.agent}>
                             <span>{person.agent}: </span>
                             <span style={{ fontWeight: 'bold' }}>{person.count} Tickets</span>
                             <br />
@@ -209,7 +209,7 @@ const TicketPage = () => {
 
                     {userJson.role !== 'agent' && <h2>Departments</h2>}
                     {info?.departments?.map((person: any) => (
-                        <div style={{ display: 'inline' }}>
+                        <div style={{ display: 'inline' }} key={person.department}>
                             <span>{person.agent}: </span>
                             <span style={{ fontWeight: 'bold' }}>{person.count} Tickets</span>
                             <br />
